@@ -1,0 +1,15 @@
+
+cd /usr/src/minix/drivers/dfa 
+
+make clean
+make
+make install
+
+service up /service/dfa
+service update /service/dfa
+service down dfa
+
+cd /
+
+make ioc_example
+./ioc_example
