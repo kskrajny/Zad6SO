@@ -12,4 +12,7 @@ service down dfa
 cd /
 
 make ioc_example
-./ioc_example
+make ioc_reject
+make ioc_reset
+make ioc_round
+make go_round

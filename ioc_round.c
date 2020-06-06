@@ -13,20 +13,21 @@ int main(int argc, char** argv) {
     if ((fd = open("/dev/dfa", O_RDONLY)) < 0)
         exit(1);
 
-    tr[0] = 0;
-    tr[2] = 1;
+    tr[1] = '0';
 
     for (a = SCHAR_MIN; a != SCHAR_MAX; a++) {
-        tr[1] = a;
+        tr[0] = a;
+        tr[2] = a+1; 
         if (ioctl(fd, DFAIOCADD, tr) < 0)
             exit(1);
     }
 
-    tr[1] = SCHAR_MAX;
+    tr[0] = SCHAR_MAX;
+    tr[2] = SCHAR_MIN;
     if (ioctl(fd, DFAIOCADD, tr) < 0)
         exit(1);
 
-    tr[0] = 1;
+    tr[0] = 0;
     if (ioctl(fd, DFAIOCACCEPT, tr) < 0)
         exit(1);
 }

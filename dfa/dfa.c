@@ -57,15 +57,15 @@ dfa_ioctl(devminor_t UNUSED(minor), unsigned long request, endpoint_t endpt,
 {           
     /* Process I/O control requests */                               
     int r;                      
-                                                                                                               
+    char acc;
+    unsigned char move[3];
+    char rej;
+
     switch(request) {
         case DFAIOCRESET:
-            printf("DFAIOCRESET\n");
             node = 0;
             break;
         case DFAIOCADD:
-            printf("DFAIOCADD\n");
-            unsigned char move[3];
             r = sys_safecopyfrom(endpt, grant, 0, (vir_bytes) move, 3);
             if (r != OK)
                 return r;
@@ -73,16 +73,12 @@ dfa_ioctl(devminor_t UNUSED(minor), unsigned long request, endpoint_t endpt,
             node = 0;
             break;
         case DFAIOCACCEPT:
-            printf("DFAIOCACCEPT\n");
-            char acc;
             r = sys_safecopyfrom(endpt, grant, 0, (vir_bytes) &acc, 1);
             if (r != OK)
                 return r;
             accept[acc] = 1;
             break;
-        case DFAIOCREJECT :
-            printf("DFAIOCREJECT \n");
-            char rej;
+        case DFAIOCREJECT:
             r = sys_safecopyfrom(endpt, grant, 0, (vir_bytes) &rej, 1);
             if (r != OK)
                 return r;
@@ -95,13 +91,11 @@ dfa_ioctl(devminor_t UNUSED(minor), unsigned long request, endpoint_t endpt,
 static int dfa_open(devminor_t UNUSED(minor), int UNUSED(access),
     endpoint_t UNUSED(user_endpt))
 {
-    printf("dfa_open()\n");
     return OK;
 }
 
 static int dfa_close(devminor_t UNUSED(minor))
 {
-    printf("dfa_close()\n");
     return OK;
 }
 
@@ -165,7 +159,6 @@ static int lu_state_restore() {
     ds_delete_mem("in");
     ds_retrieve_mem("node", &node, &len);
     ds_delete_mem("node");
-
     return OK;
 }
 
@@ -199,7 +192,6 @@ static int sef_cb_init(int type, sef_init_info_t *UNUSED(info))
 
     switch(type) {
         case SEF_INIT_FRESH:
-            printf("DFA SEF_INIT_FRESH\n");
             memset(accept, 0, NODES);
             memset(func, 0, NODES*NODES);
         break;
@@ -208,12 +200,10 @@ static int sef_cb_init(int type, sef_init_info_t *UNUSED(info))
             /* Restore the state. */
             lu_state_restore();
             do_announce_driver = FALSE;
-            printf("SEF_INIT_LU Hey, I'm a new version! %s\n", in);
         break;
 
         case SEF_INIT_RESTART:
-            printf("SEF_INIT_RESTART Hey, I've just been restarted!\n");
-        break;
+            break;
     }
 
     /* Announce we are up when necessary. */
